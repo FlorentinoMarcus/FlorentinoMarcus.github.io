@@ -69,8 +69,8 @@
       setPageAvailable(true);
       window.setTimeout(() => {
         document.body.classList.remove('intro-active');
-      }, reduceMotion.matches ? 0 : 220);
-      window.setTimeout(() => intro.remove(), reduceMotion.matches ? 20 : 650);
+      }, 220);
+      window.setTimeout(() => intro.remove(), 650);
     };
     const wait = (duration) => new Promise((resolve) => window.setTimeout(resolve, duration));
     const runPointerSequence = async () => {
@@ -139,17 +139,13 @@
       await wait(200);
       beginExit();
     };
-    if (reduceMotion.matches) {
-      window.setTimeout(beginExit, 20);
-    } else {
-      runPointerSequence().catch(beginExit);
-    }
+    runPointerSequence().catch(beginExit);
   };
 
   const readyIntro = () => {
     if (!enterButton || introFinished) return;
     completeIntroText();
-    autoEnterTimer = window.setTimeout(finishIntro, reduceMotion.matches ? 120 : 220);
+    autoEnterTimer = window.setTimeout(finishIntro, 220);
   };
 
   const typeName = (name, index = 0) => {
@@ -166,12 +162,8 @@
     setPageAvailable(false);
     intro.focus({ preventScroll: true });
     const name = typedName.dataset.text || 'Marcus Florentino';
-    typedName.textContent = reduceMotion.matches ? name : '';
-    if (reduceMotion.matches) {
-      readyIntro();
-    } else {
-      typingTimer = window.setTimeout(() => typeName(name), 500);
-    }
+    typedName.textContent = '';
+    typingTimer = window.setTimeout(() => typeName(name), 500);
     enterButton.addEventListener('click', finishIntro);
     window.addEventListener('keydown', handleIntroKey);
   } else {

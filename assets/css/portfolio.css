@@ -234,14 +234,3 @@ body.intro-active [data-enter] .hero-title-layer, body.intro-active [data-enter]
   .intro-screen { padding-inline: 12px; }
   .intro-editor { grid-template-columns: 24px minmax(0, 1fr); column-gap: 8px; padding-right: 10px; padding-left: 4px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .intro-curtain { transition-delay: 0ms; }
-  .intro-ide { animation-name: intro-fade; transform: none; }
-  .intro-pointer { display: none; }
-  .intro-ide.is-window-closing { transform: none; }
-  [data-enter] .hero-title-layer, [data-enter] .hero-person img, [data-enter] .skill-callout, [data-enter] .hero-bottom { animation-name: hero-fade !important; animation-delay: 0ms !important; }
-}
-@keyframes intro-fade { from { opacity: 0; } }
-@keyframes hero-fade { from { opacity: 0; } }
