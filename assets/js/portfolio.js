@@ -41,9 +41,10 @@
   window.addEventListener('orientationchange', queueHeroScale, { passive: true });
 
   const initHeroDots = () => {
-    const canvas = hero?.querySelector('[data-hero-dots]');
-    const context = canvas?.getContext('2d');
-    if (!canvas || !context || !hero) return;
+    document.querySelectorAll('[data-hero-dots]').forEach((canvas) => {
+      const surface = canvas.parentElement;
+      const context = canvas.getContext('2d');
+      if (!context || !surface) return;
 
     const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
     const pointer = { x: 0, y: 0, active: false };
@@ -103,7 +104,7 @@
     };
 
     const rebuild = () => {
-      const rect = hero.getBoundingClientRect();
+      const rect = surface.getBoundingClientRect();
       width = Math.max(1, rect.width);
       height = Math.max(1, rect.height);
       pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
@@ -123,7 +124,7 @@
     };
 
     const updatePointer = (event) => {
-      const rect = hero.getBoundingClientRect();
+      const rect = surface.getBoundingClientRect();
       pointer.x = event.clientX - rect.left;
       pointer.y = event.clientY - rect.top;
       pointer.active = true;
@@ -136,21 +137,22 @@
     };
 
     const syncInteraction = () => {
-      hero.removeEventListener('pointermove', updatePointer);
-      hero.removeEventListener('pointerleave', releasePointer);
+      surface.removeEventListener('pointermove', updatePointer);
+      surface.removeEventListener('pointerleave', releasePointer);
       pointer.active = false;
       if (!reduceMotion.matches && finePointer.matches) {
-        hero.addEventListener('pointermove', updatePointer, { passive: true });
-        hero.addEventListener('pointerleave', releasePointer, { passive: true });
+        surface.addEventListener('pointermove', updatePointer, { passive: true });
+        surface.addEventListener('pointerleave', releasePointer, { passive: true });
       }
       requestDraw();
     };
 
-    new ResizeObserver(rebuild).observe(hero);
+    new ResizeObserver(rebuild).observe(surface);
     reduceMotion.addEventListener('change', syncInteraction);
     finePointer.addEventListener('change', syncInteraction);
     rebuild();
     syncInteraction();
+    });
   };
 
   initHeroDots();
@@ -314,7 +316,7 @@
   menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 700) closeMenu(); });
 
-  const projectSections = ['trailer', 'gameplay', 'roles', 'awards']
+  const projectSections = ['trailer', 'mob-control', 'gameplay', 'roles', 'awards']
     .map((id) => document.getElementById(id))
     .filter(Boolean);
   const projectNavLinks = [...document.querySelectorAll('.desktop-nav a[href^="#"], .mobile-menu a[href^="#"]')];
@@ -506,7 +508,6 @@
     const previousButton = carousel.querySelector('[data-carousel-prev]');
     const nextButton = carousel.querySelector('[data-carousel-next]');
     let currentSlide = 1;
-    let touchStartX = null;
 
     const showSlide = (nextIndex) => {
       currentSlide = (nextIndex + slides.length) % slides.length;
@@ -516,9 +517,11 @@
         slide.classList.toggle('is-active', isActive);
         slide.setAttribute('aria-hidden', String(!isActive));
         slide.toggleAttribute('inert', !isActive);
-        const video = slide.querySelector('video');
-        if (video) video.tabIndex = isActive ? 0 : -1;
-        if (!isActive) video?.pause();
+        const player = slide.querySelector('iframe');
+        if (player) player.tabIndex = isActive ? 0 : -1;
+        if (!isActive) {
+          player?.contentWindow?.postMessage('{"event":"command","func":"pauseVideo","args":[]}', 'https://www.youtube-nocookie.com');
+        }
       });
       if (currentLabel) currentLabel.textContent = String(currentSlide + 1);
     };
@@ -535,15 +538,6 @@
         showSlide(currentSlide + 1);
       }
     });
-    carousel.addEventListener('touchstart', (event) => {
-      touchStartX = event.touches[0]?.clientX ?? null;
-    }, { passive: true });
-    carousel.addEventListener('touchend', (event) => {
-      if (touchStartX === null) return;
-      const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
-      if (Math.abs(distance) > 48) showSlide(currentSlide + (distance < 0 ? 1 : -1));
-      touchStartX = null;
-    }, { passive: true });
 
     showSlide(1);
   }

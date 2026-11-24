@@ -34,7 +34,7 @@ The portfolio leads with playable work and documented credits across gameplay, s
 
 - `Para Po!`: released Windows simulation; Marcus is credited as lead programmer, gameplay programmer, systems programmer, UI programmer, and level designer.
 - `Relapse`: canceled Windows first-person action prototype; Marcus is credited as a programmer.
-- Real project screenshots in `images/para-po-*.png` and `images/relapse-*.png`, sourced from the linked itch.io project pages.
+- Real project screenshots in `images/para-po/` and `images/relapse/`, sourced from the linked itch.io project pages.
 - No testimonials, employment history, résumé, portrait, private client list, or performance metrics are on hand.
 
 ## Product Principles
