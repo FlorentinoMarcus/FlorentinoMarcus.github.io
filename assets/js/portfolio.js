@@ -20,8 +20,12 @@
     const availableWidth = headerWrap?.getBoundingClientRect().width || window.innerWidth;
     const availableHeight = Math.max(1, window.innerHeight - navHeight - 28);
     const scale = Math.min(1, availableWidth / heroReference.width, availableHeight / heroReference.height);
+    const heroEdgeSpace = 12 + (heroReference.height * .1 * scale);
+    const heroOverhang = 48 * scale;
     hero.style.setProperty('--hero-scale', scale.toFixed(6));
     hero.style.setProperty('--hero-scaled-height', `${(heroReference.height * scale).toFixed(3)}px`);
+    document.documentElement.style.setProperty('--hero-edge-space', `${heroEdgeSpace.toFixed(3)}px`);
+    document.documentElement.style.setProperty('--hero-overhang', `${heroOverhang.toFixed(3)}px`);
   };
   const queueHeroScale = () => {
     window.cancelAnimationFrame(heroResizeFrame);
@@ -30,6 +34,122 @@
   syncHeroScale();
   window.addEventListener('resize', queueHeroScale, { passive: true });
   window.addEventListener('orientationchange', queueHeroScale, { passive: true });
+
+  const initHeroDots = () => {
+    const canvas = hero?.querySelector('[data-hero-dots]');
+    const context = canvas?.getContext('2d');
+    if (!canvas || !context || !hero) return;
+
+    const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    const pointer = { x: 0, y: 0, active: false };
+    const dots = [];
+    const proximity = 130;
+    const pushDistance = 18;
+    let frame = 0;
+    let width = 0;
+    let height = 0;
+    let pixelRatio = 1;
+
+    const draw = (animate = false) => {
+      context.clearRect(0, 0, width, height);
+      let unsettled = false;
+
+      dots.forEach((dot) => {
+        const offsetX = pointer.x - dot.originX;
+        const offsetY = pointer.y - dot.originY;
+        const distance = Math.hypot(offsetX, offsetY) || 1;
+        const influence = pointer.active && distance < proximity
+          ? (1 - distance / proximity) ** 2
+          : 0;
+        const targetX = dot.originX - (offsetX / distance) * pushDistance * influence;
+        const targetY = dot.originY - (offsetY / distance) * pushDistance * influence;
+
+        if (animate) {
+          dot.velocityX = (dot.velocityX + (targetX - dot.x) * .13) * .74;
+          dot.velocityY = (dot.velocityY + (targetY - dot.y) * .13) * .74;
+          dot.x += dot.velocityX;
+          dot.y += dot.velocityY;
+        } else {
+          dot.x = targetX;
+          dot.y = targetY;
+        }
+
+        if (Math.abs(dot.x - dot.originX) > .02 || Math.abs(dot.y - dot.originY) > .02 || Math.abs(dot.velocityX) > .02 || Math.abs(dot.velocityY) > .02) {
+          unsettled = true;
+        }
+
+        const baseAlpha = .16;
+        const activeAlpha = baseAlpha + influence * .78;
+        const red = Math.round(164 + (246 - 164) * influence);
+        const green = Math.round(158 + (138 - 158) * influence);
+        const blue = Math.round(151 + (46 - 151) * influence);
+        context.beginPath();
+        context.arc(dot.x, dot.y, 1.15 + influence * 1.55, 0, Math.PI * 2);
+        context.fillStyle = `rgba(${red}, ${green}, ${blue}, ${activeAlpha})`;
+        context.fill();
+      });
+
+      frame = 0;
+      if (unsettled) frame = window.requestAnimationFrame(() => draw(true));
+    };
+
+    const requestDraw = () => {
+      if (!frame) frame = window.requestAnimationFrame(() => draw(true));
+    };
+
+    const rebuild = () => {
+      const rect = hero.getBoundingClientRect();
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      pixelRatio = Math.min(window.devicePixelRatio || 1, 1.5);
+      canvas.width = Math.round(width * pixelRatio);
+      canvas.height = Math.round(height * pixelRatio);
+      context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+      dots.length = 0;
+
+      const gap = width < 700 ? 26 : 30;
+      const inset = gap * .5;
+      for (let y = inset; y < height; y += gap) {
+        for (let x = inset; x < width; x += gap) {
+          dots.push({ originX: x, originY: y, x, y, velocityX: 0, velocityY: 0 });
+        }
+      }
+      draw(false);
+    };
+
+    const updatePointer = (event) => {
+      const rect = hero.getBoundingClientRect();
+      pointer.x = event.clientX - rect.left;
+      pointer.y = event.clientY - rect.top;
+      pointer.active = true;
+      requestDraw();
+    };
+
+    const releasePointer = () => {
+      pointer.active = false;
+      requestDraw();
+    };
+
+    const syncInteraction = () => {
+      hero.removeEventListener('pointermove', updatePointer);
+      hero.removeEventListener('pointerleave', releasePointer);
+      pointer.active = false;
+      if (!reduceMotion.matches && finePointer.matches) {
+        hero.addEventListener('pointermove', updatePointer, { passive: true });
+        hero.addEventListener('pointerleave', releasePointer, { passive: true });
+      }
+      requestDraw();
+    };
+
+    new ResizeObserver(rebuild).observe(hero);
+    reduceMotion.addEventListener('change', syncInteraction);
+    finePointer.addEventListener('change', syncInteraction);
+    rebuild();
+    syncInteraction();
+  };
+
+  initHeroDots();
+
   const resetLandingScroll = () => {
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
@@ -188,6 +308,34 @@
   menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 700) closeMenu(); });
 
+  const projectSections = ['trailer', 'gameplay', 'roles', 'awards']
+    .map((id) => document.getElementById(id))
+    .filter(Boolean);
+  const projectNavLinks = [...document.querySelectorAll('.desktop-nav a[href^="#"], .mobile-menu a[href^="#"]')];
+  let projectNavFrame;
+  const updateProjectNavigation = () => {
+    if (!projectSections.length || !projectNavLinks.length) return;
+    const navHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav')) || 72;
+    const marker = window.scrollY + navHeight + Math.min(window.innerHeight * .28, 240);
+    let currentSection = projectSections[0].id;
+    projectSections.forEach((projectSection) => {
+      if (projectSection.offsetTop <= marker) currentSection = projectSection.id;
+    });
+    projectNavLinks.forEach((link) => {
+      const isActive = link.getAttribute('href') === `#${currentSection}`;
+      link.classList.toggle('is-active', isActive);
+      if (isActive) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  const queueProjectNavigation = () => {
+    window.cancelAnimationFrame(projectNavFrame);
+    projectNavFrame = window.requestAnimationFrame(updateProjectNavigation);
+  };
+  window.addEventListener('scroll', queueProjectNavigation, { passive: true });
+  window.addEventListener('resize', queueProjectNavigation, { passive: true });
+  updateProjectNavigation();
+
   const section = document.querySelector('.case-track');
   const steps = [...document.querySelectorAll('[data-chapter]')];
   const images = [...document.querySelectorAll('[data-image]')];
@@ -216,4 +364,162 @@
   }, { passive: true });
   window.addEventListener('resize', updateChapter);
   updateChapter();
+
+  const gameplayCarousel = document.querySelector('[data-gameplay-carousel]');
+  if (gameplayCarousel) {
+    const slides = [...gameplayCarousel.querySelectorAll('.gameplay-slide')];
+    const currentLabel = document.querySelector('[data-gameplay-current]');
+    const currentCaption = document.querySelector('[data-gameplay-caption]');
+    const previousButton = document.querySelector('[data-gameplay-prev]');
+    const nextButton = document.querySelector('[data-gameplay-next]');
+    let currentSlide = 0;
+    let pointerStartX = null;
+
+    const renderGameplayCarousel = () => {
+      const isCompact = window.innerWidth <= 700;
+      const slideStep = gameplayCarousel.clientWidth * (isCompact ? .64 : .48);
+      slides.forEach((slide, index) => {
+        let offset = index - currentSlide;
+        const midpoint = Math.floor(slides.length / 2);
+        if (offset > midpoint) offset -= slides.length;
+        if (offset < -midpoint) offset += slides.length;
+        const isActive = offset === 0;
+        const previousOffset = slide.dataset.carouselOffset === undefined ? null : Number(slide.dataset.carouselOffset);
+        const isPortalJump = previousOffset !== null && Math.abs(offset - previousOffset) > 1;
+        if (isPortalJump) {
+          const portalToken = String((Number(slide.dataset.portalToken) || 0) + 1);
+          slide.dataset.portalToken = portalToken;
+          slide.classList.add('is-portal-jump');
+          window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(() => {
+              if (slide.dataset.portalToken === portalToken) slide.classList.remove('is-portal-jump');
+            });
+          });
+        }
+        slide.dataset.carouselOffset = String(offset);
+        slide.style.setProperty('--slide-x', `${offset * slideStep}px`);
+        slide.style.setProperty('--slide-y', '0px');
+        slide.style.setProperty('--slide-depth', isActive ? '0px' : '-110px');
+        slide.style.setProperty('--slide-tilt', '0deg');
+        slide.style.setProperty('--slide-rotate', '0deg');
+        slide.style.setProperty('--slide-scale', isActive ? '1' : '.88');
+        slide.style.setProperty('--slide-opacity', isActive ? '1' : '.86');
+        slide.style.setProperty('--slide-origin', isActive ? 'center' : offset < 0 ? 'right center' : 'left center');
+        slide.style.setProperty('--slide-z', isActive ? '3' : '1');
+        slide.style.setProperty('--image-shift', `${offset * -7}%`);
+        slide.classList.toggle('is-active', isActive);
+        slide.setAttribute('aria-hidden', String(!isActive));
+      });
+      if (currentLabel) currentLabel.textContent = String(currentSlide + 1).padStart(2, '0');
+      if (currentCaption) currentCaption.textContent = slides[currentSlide]?.querySelector('figcaption')?.textContent || '';
+    };
+
+    const showGameplaySlide = (nextIndex) => {
+      currentSlide = (nextIndex + slides.length) % slides.length;
+      gameplayCarousel.style.removeProperty('--drag-shift');
+      slides.forEach((slide) => {
+        slide.style.removeProperty('--drag-shift');
+        slide.querySelector('img')?.style.removeProperty('--image-drag');
+      });
+      renderGameplayCarousel();
+    };
+
+    const finishGameplayDrag = (event) => {
+      if (pointerStartX === null) return;
+      const distance = event.clientX - pointerStartX;
+      gameplayCarousel.classList.remove('is-dragging');
+      pointerStartX = null;
+      if (Math.abs(distance) > 54) {
+        showGameplaySlide(currentSlide + (distance < 0 ? 1 : -1));
+      } else {
+        slides.forEach((slide) => {
+          slide.style.removeProperty('--drag-shift');
+          slide.querySelector('img')?.style.removeProperty('--image-drag');
+        });
+      }
+    };
+
+    previousButton?.addEventListener('click', () => showGameplaySlide(currentSlide - 1));
+    nextButton?.addEventListener('click', () => showGameplaySlide(currentSlide + 1));
+    gameplayCarousel.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        showGameplaySlide(currentSlide - 1);
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        showGameplaySlide(currentSlide + 1);
+      }
+    });
+    gameplayCarousel.addEventListener('pointerdown', (event) => {
+      if (event.button !== 0) return;
+      pointerStartX = event.clientX;
+      gameplayCarousel.classList.add('is-dragging');
+      gameplayCarousel.setPointerCapture(event.pointerId);
+    });
+    gameplayCarousel.addEventListener('pointermove', (event) => {
+      if (pointerStartX === null) return;
+      const distance = Math.max(-160, Math.min(160, event.clientX - pointerStartX));
+      slides.forEach((slide) => {
+        const offset = Number(slide.dataset.carouselOffset || 0);
+        const layerSpeed = offset === 0 ? 1 : .68;
+        slide.style.setProperty('--drag-shift', `${distance * layerSpeed}px`);
+        slide.querySelector('img')?.style.setProperty('--image-drag', `${distance * (offset === 0 ? -.035 : -.09)}px`);
+      });
+    });
+    gameplayCarousel.addEventListener('pointerup', finishGameplayDrag);
+    gameplayCarousel.addEventListener('pointercancel', finishGameplayDrag);
+    window.addEventListener('resize', renderGameplayCarousel, { passive: true });
+    renderGameplayCarousel();
+  }
+
+  const carousel = document.querySelector('[data-ad-carousel]');
+  if (carousel) {
+    const slides = [...carousel.querySelectorAll('[data-ad-slide]')];
+    const track = carousel.querySelector('[data-carousel-track]');
+    const currentLabel = carousel.querySelector('[data-carousel-current]');
+    const previousButton = carousel.querySelector('[data-carousel-prev]');
+    const nextButton = carousel.querySelector('[data-carousel-next]');
+    let currentSlide = 1;
+    let touchStartX = null;
+
+    const showSlide = (nextIndex) => {
+      currentSlide = (nextIndex + slides.length) % slides.length;
+      track?.style.setProperty('--carousel-index', currentSlide);
+      slides.forEach((slide, index) => {
+        const isActive = index === currentSlide;
+        slide.classList.toggle('is-active', isActive);
+        slide.setAttribute('aria-hidden', String(!isActive));
+        slide.toggleAttribute('inert', !isActive);
+        const video = slide.querySelector('video');
+        if (video) video.tabIndex = isActive ? 0 : -1;
+        if (!isActive) video?.pause();
+      });
+      if (currentLabel) currentLabel.textContent = String(currentSlide + 1);
+    };
+
+    previousButton?.addEventListener('click', () => showSlide(currentSlide - 1));
+    nextButton?.addEventListener('click', () => showSlide(currentSlide + 1));
+    carousel.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        showSlide(currentSlide - 1);
+      }
+      if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        showSlide(currentSlide + 1);
+      }
+    });
+    carousel.addEventListener('touchstart', (event) => {
+      touchStartX = event.touches[0]?.clientX ?? null;
+    }, { passive: true });
+    carousel.addEventListener('touchend', (event) => {
+      if (touchStartX === null) return;
+      const distance = (event.changedTouches[0]?.clientX ?? touchStartX) - touchStartX;
+      if (Math.abs(distance) > 48) showSlide(currentSlide + (distance < 0 ? 1 : -1));
+      touchStartX = null;
+    }, { passive: true });
+
+    showSlide(1);
+  }
 })();

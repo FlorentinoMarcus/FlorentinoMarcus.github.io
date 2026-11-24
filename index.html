@@ -7,7 +7,7 @@
   <meta name="description" content="Game developer Marcus Florentino’s selected work in gameplay, systems, UI programming, and level design.">
   <meta name="page-type" content="software">
   <meta name="site-kind" content="gaming">
-  <meta name="theme-color" content="#18191b">
+  <meta name="theme-color" content="#11110f">
   <meta property="og:title" content="Marcus Florentino — Game Developer">
   <meta property="og:description" content="Selected game development work across gameplay, systems, UI programming, and level design.">
   <meta property="og:type" content="website">
@@ -72,6 +72,7 @@
 
   <main id="main">
     <section class="hero" id="top" data-enter>
+      <canvas class="hero-dot-grid" data-hero-dots aria-hidden="true"></canvas>
       <div class="wrap hero-scene">
         <div class="hero-title-layer">
           <h1><span>Marcus Florentino</span><span>Game Developer</span></h1>
@@ -80,12 +81,12 @@
           <img src="images/My Portrait HD Edited.png" alt="Portrait of Marcus Florentino wearing a plain black jacket" width="3117" height="3894" fetchpriority="high">
         </figure>
         <div class="skill-orbits" role="list" aria-label="Development skills">
-          <span class="skill-callout skill-unity" role="listitem"><strong>Unity</strong><span class="skill-level">Intermediate</span></span>
-          <span class="skill-callout skill-ue4" role="listitem"><strong>UE4</strong><span class="skill-level">Intermediate</span></span>
-          <span class="skill-callout skill-ue5" role="listitem"><strong>UE5</strong><span class="skill-level">Intermediate</span></span>
-          <span class="skill-callout skill-git" role="listitem"><strong>Git</strong><span class="skill-level">Intermediate</span></span>
-          <span class="skill-callout skill-cpp" role="listitem"><strong>C++</strong><span class="skill-level">Intermediate</span></span>
+          <span class="skill-callout skill-advanced skill-unity" role="listitem"><strong>Unity</strong><span class="skill-level">Advanced</span></span>
+          <span class="skill-callout skill-advanced skill-cpp" role="listitem"><strong>C++</strong><span class="skill-level">Advanced</span></span>
           <span class="skill-callout skill-csharp" role="listitem"><strong>C#</strong><span class="skill-level">Intermediate</span></span>
+          <span class="skill-callout skill-ue4" role="listitem"><strong>UE4</strong><span class="skill-level">Intermediate</span></span>
+          <span class="skill-callout skill-git" role="listitem"><strong>Git</strong><span class="skill-level">Intermediate</span></span>
+          <span class="skill-callout skill-ue5" role="listitem"><strong>UE5</strong><span class="skill-level">Intermediate</span></span>
           <span class="skill-callout skill-luau" role="listitem"><strong>Luau</strong><span class="skill-level">Basic</span></span>
           <span class="skill-callout skill-javascript" role="listitem"><strong>JavaScript</strong><span class="skill-level">Basic</span></span>
           <span class="skill-callout skill-html" role="listitem"><strong>HTML</strong><span class="skill-level">Basic</span></span>
@@ -93,44 +94,34 @@
         </div>
         <div class="hero-bottom">
           <div class="hero-actions">
-            <a class="button" href="#work">View selected work</a>
-            <a class="text-link" href="https://github.com/FlorentinoMarcus" target="_blank" rel="noreferrer">View GitHub</a>
+            <a class="button" href="">Resume</a>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="case-study" id="work" data-moment="pinned-chapters">
-      <div class="wrap case-heading">
-        <p class="kicker">Featured project</p>
-        <h2>Para Po!</h2>
-        <p>A released 3D simulation game about navigating the work and daily pressures of jeepney driving in the Philippines.</p>
-      </div>
-      <div class="case-track">
-        <div class="wrap case-stage">
-          <div class="case-copy" aria-label="Para Po project details">
-            <article class="case-step is-active" data-chapter="0">
-              <span class="chapter-index">01</span>
-              <h3>Lead programming</h3>
-              <p>Credited as lead programmer across gameplay, systems, and UI programming.</p>
-            </article>
-            <article class="case-step" data-chapter="1">
-              <span class="chapter-index">02</span>
-              <h3>Driving systems</h3>
-              <p>Pick-ups, drop-offs, fares, resource management, and unpredictable city traffic shape each route.</p>
-            </article>
-            <article class="case-step" data-chapter="2">
-              <span class="chapter-index">03</span>
-              <h3>World and level design</h3>
-              <p>Level-design work supports a colorful, recognizably Filipino setting built around the player’s route.</p>
-            </article>
-            <a class="button button-inverse" href="https://king-marcus.itch.io/para-po" target="_blank" rel="noreferrer">View Para Po!</a>
-          </div>
-          <div class="case-visual" aria-live="polite">
-            <img class="chapter-image is-active" data-image="0" src="images/para-po-01.png" alt="Para Po main menu overlooking a colorful low-poly town" width="794" height="442">
-            <img class="chapter-image" data-image="1" src="images/para-po-02.png" alt="Para Po driving gameplay and fare collection interface" width="794" height="446" loading="lazy" aria-hidden="true">
-            <img class="chapter-image" data-image="2" src="images/para-po-03.png" alt="Para Po characters outside a police station" width="794" height="421" loading="lazy" aria-hidden="true">
-          </div>
+    <section class="featured-project" id="work" aria-labelledby="featured-project-title">
+      <div class="wrap">
+        <div class="featured-heading">
+          <h2 id="featured-project-title">Featured Projects</h2>
+        </div>
+        <div class="featured-banner-list">
+          <a class="featured-banner featured-banner-para" href="para-po.html" aria-label="Open the Para Po featured project">
+            <img class="featured-banner-art" src="images/para-po-banner.png" alt="Para Po illustrated banner with a jeepney and passengers on a Philippine road" width="1920" height="1080">
+            <img class="featured-banner-logo" src="images/para-po-logo-hd.png" alt="Para Po mascot" width="1254" height="1254" loading="lazy">
+            <span class="featured-banner-label">
+              <span>Para Po!</span>
+              <span>View project</span>
+            </span>
+          </a>
+          <a class="featured-banner featured-banner-ads" href="mob-control.html" aria-label="Open the Mob Control video ad showcase">
+            <img class="featured-banner-art" src="images/mob-control-library-hero-2x.jpg" alt="Mob Control characters charging through a colorful city" width="3840" height="1240" loading="lazy">
+            <img class="featured-banner-logo" src="images/mob-control-logo.png" alt="Mob Control" width="1419" height="723" loading="lazy">
+            <span class="featured-banner-label">
+              <span>Mob Control</span>
+              <span>View showcase</span>
+            </span>
+          </a>
         </div>
       </div>
     </section>
