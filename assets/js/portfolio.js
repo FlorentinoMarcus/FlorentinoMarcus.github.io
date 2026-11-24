@@ -14,6 +14,11 @@
   let introFinished = false;
   let typingTimer;
   let autoEnterTimer;
+  let introSeen = false;
+  try {
+    introSeen = window.sessionStorage.getItem('portfolio-intro-seen') === 'true';
+    if (intro && !introSeen) window.sessionStorage.setItem('portfolio-intro-seen', 'true');
+  } catch {}
   const syncHeroScale = () => {
     if (!hero) return;
     const navHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav')) || 72;
@@ -278,7 +283,7 @@
     typingTimer = window.setTimeout(() => typeName(name, index + 1), 45);
   };
 
-  if (intro && typedName && enterButton) {
+  if (intro && typedName && enterButton && !introSeen) {
     setPageAvailable(false);
     intro.focus({ preventScroll: true });
     const name = typedName.dataset.text || 'Marcus Florentino';
@@ -287,6 +292,7 @@
     enterButton.addEventListener('click', finishIntro);
     window.addEventListener('keydown', handleIntroKey);
   } else {
+    intro?.remove();
     document.body.classList.remove('intro-active');
   }
 
@@ -321,6 +327,9 @@
     projectSections.forEach((projectSection) => {
       if (projectSection.offsetTop <= marker) currentSection = projectSection.id;
     });
+    if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+      currentSection = projectSections.at(-1).id;
+    }
     projectNavLinks.forEach((link) => {
       const isActive = link.getAttribute('href') === `#${currentSection}`;
       link.classList.toggle('is-active', isActive);
@@ -372,14 +381,16 @@
     const currentCaption = document.querySelector('[data-gameplay-caption]');
     const previousButton = document.querySelector('[data-gameplay-prev]');
     const nextButton = document.querySelector('[data-gameplay-next]');
+    const dragStep = 560;
+    const dragReleaseThreshold = 140;
     let currentSlide = 0;
     let pointerStartX = null;
+    const getGameplaySlideStep = () => gameplayCarousel.clientWidth * (window.innerWidth <= 700 ? .64 : .48);
 
     const renderGameplayCarousel = () => {
-      const isCompact = window.innerWidth <= 700;
-      const slideStep = gameplayCarousel.clientWidth * (isCompact ? .64 : .48);
+      const slideStep = getGameplaySlideStep();
       slides.forEach((slide, index) => {
-        let offset = index - currentSlide;
+        let offset = currentSlide - index;
         const midpoint = Math.floor(slides.length / 2);
         if (offset > midpoint) offset -= slides.length;
         if (offset < -midpoint) offset += slides.length;
@@ -403,8 +414,10 @@
         slide.style.setProperty('--slide-tilt', '0deg');
         slide.style.setProperty('--slide-rotate', '0deg');
         slide.style.setProperty('--slide-scale', isActive ? '1' : '.88');
-        slide.style.setProperty('--slide-opacity', isActive ? '1' : '.86');
-        slide.style.setProperty('--slide-origin', isActive ? 'center' : offset < 0 ? 'right center' : 'left center');
+        slide.style.setProperty('--slide-opacity', isActive ? '1' : '.68');
+        slide.style.setProperty('--slide-brightness', isActive ? '1' : '.58');
+        slide.style.setProperty('--slide-saturation', isActive ? '1' : '.72');
+        slide.style.setProperty('--slide-origin', 'center');
         slide.style.setProperty('--slide-z', isActive ? '3' : '1');
         slide.style.setProperty('--image-shift', `${offset * -7}%`);
         slide.classList.toggle('is-active', isActive);
@@ -429,13 +442,10 @@
       const distance = event.clientX - pointerStartX;
       gameplayCarousel.classList.remove('is-dragging');
       pointerStartX = null;
-      if (Math.abs(distance) > 54) {
-        showGameplaySlide(currentSlide + (distance < 0 ? 1 : -1));
+      if (Math.abs(distance) >= dragReleaseThreshold) {
+        showGameplaySlide(currentSlide + (distance > 0 ? 1 : -1));
       } else {
-        slides.forEach((slide) => {
-          slide.style.removeProperty('--drag-shift');
-          slide.querySelector('img')?.style.removeProperty('--image-drag');
-        });
+        showGameplaySlide(currentSlide);
       }
     };
 
@@ -459,12 +469,27 @@
     });
     gameplayCarousel.addEventListener('pointermove', (event) => {
       if (pointerStartX === null) return;
-      const distance = Math.max(-160, Math.min(160, event.clientX - pointerStartX));
+      let distance = event.clientX - pointerStartX;
+      if (Math.abs(distance) >= dragStep) {
+        const direction = Math.sign(distance);
+        pointerStartX = event.clientX;
+        showGameplaySlide(currentSlide + direction);
+        distance = 0;
+      }
+      const slideStep = getGameplaySlideStep();
+      const dragProgress = distance / dragStep;
+      const visualDistance = dragProgress * slideStep;
       slides.forEach((slide) => {
         const offset = Number(slide.dataset.carouselOffset || 0);
-        const layerSpeed = offset === 0 ? 1 : .68;
-        slide.style.setProperty('--drag-shift', `${distance * layerSpeed}px`);
-        slide.querySelector('img')?.style.setProperty('--image-drag', `${distance * (offset === 0 ? -.035 : -.09)}px`);
+        const proximity = 1 - Math.min(1, Math.abs(offset * slideStep + visualDistance) / slideStep);
+        slide.style.setProperty('--drag-shift', `${visualDistance}px`);
+        slide.style.setProperty('--slide-depth', `${-110 * (1 - proximity)}px`);
+        slide.style.setProperty('--slide-scale', String(.88 + proximity * .12));
+        slide.style.setProperty('--slide-opacity', String(.68 + proximity * .32));
+        slide.style.setProperty('--slide-brightness', String(.58 + proximity * .42));
+        slide.style.setProperty('--slide-saturation', String(.72 + proximity * .28));
+        slide.style.setProperty('--slide-z', proximity > .5 ? '3' : '1');
+        slide.querySelector('img')?.style.setProperty('--image-drag', `${dragProgress * -7}%`);
       });
     });
     gameplayCarousel.addEventListener('pointerup', finishGameplayDrag);

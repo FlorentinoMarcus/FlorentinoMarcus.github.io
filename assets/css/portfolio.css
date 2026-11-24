@@ -215,16 +215,16 @@ body.intro-active [data-enter] .hero-title-layer, body.intro-active [data-enter]
 .ad-carousel-controls button:active { transform: scale(.96); }
 .ad-carousel-controls svg { width: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .ad-carousel-controls p { min-width: 48px; margin: 0; color: var(--light-muted); font-family: var(--mono); font-size: .78rem; text-align: center; }
-.project-page { background: var(--light); color: var(--light-ink); }
+.project-page { --project-section-space: 76px; background: var(--light); color: var(--light-ink); }
 .project-page .site-header { color: var(--ink); }
 .project-page main { overflow: hidden; }
 .project-page h1, .project-page h2 { white-space: nowrap; }
-.project-hero { padding: calc(var(--nav) + 76px) 16px 120px; background: var(--obsidian); color: var(--ink); }
+.project-hero { padding: calc(var(--nav) + var(--project-section-space)) 16px var(--project-section-space); background: var(--obsidian); color: var(--ink); }
 .project-hero-heading { display: grid; grid-template-columns: 7fr 5fr; gap: 48px; align-items: end; margin-bottom: 48px; }
 .project-hero-heading h1 { margin: 0; font-size: clamp(4.5rem, 9vw, 6rem); color: var(--ink); }
 .project-hero-summary { max-width: 560px; margin: 0 0 8px; color: var(--muted); font-size: 1.08rem; }
 .project-hero-video { width: min(calc(100% - (2 * var(--gutter))), 1280px); }
-.gameplay-section, .roles-section, .awards-section { padding: 120px 16px; }
+.gameplay-section, .roles-section, .awards-section { padding: var(--project-section-space) 16px; }
 .project-section-heading { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(48px, 8vw, 112px); align-items: start; margin-bottom: 64px; }
 .project-section-heading h2 { max-width: 900px; margin: 0; font-size: clamp(3.2rem, 7vw, 6rem); }
 .project-section-heading p { max-width: 660px; margin: 8px 0 0; color: var(--light-muted); font-size: clamp(1.08rem, 1.4vw, 1.24rem); line-height: 1.72; }
@@ -252,17 +252,16 @@ body.intro-active [data-enter] .hero-title-layer, body.intro-active [data-enter]
 .gameplay-carousel::after { right: 0; background: linear-gradient(270deg, var(--light) 0%, rgba(17, 17, 15, .94) 34%, transparent 100%); }
 .gameplay-carousel.is-dragging { cursor: grabbing; }
 .gameplay-carousel-track { position: absolute; inset: 0; }
-.gameplay-slide { position: absolute; z-index: var(--slide-z, 1); top: 50%; left: 50%; width: 56%; aspect-ratio: 16 / 9; margin: 0; overflow: hidden; border-radius: 12px; background: var(--surface); opacity: var(--slide-opacity, 1); box-shadow: 0 24px 68px rgba(0, 0, 0, .38); transform: translate3d(calc(-50% + var(--slide-x, 0px) + var(--drag-shift, 0px)), calc(-50% + var(--slide-y, 0px)), var(--slide-depth, 0px)) rotateZ(var(--slide-tilt, 0deg)) rotateY(var(--slide-rotate, 0deg)) scale(var(--slide-scale, 1)); transform-origin: var(--slide-origin, center); transition: transform 620ms var(--ease-out), opacity 240ms var(--ease-out), filter 240ms ease; will-change: transform; }
+.gameplay-slide { position: absolute; z-index: var(--slide-z, 1); top: 50%; left: 50%; width: 56%; aspect-ratio: 16 / 9; margin: 0; overflow: hidden; border-radius: 12px; background: var(--surface); opacity: var(--slide-opacity, 1); filter: saturate(var(--slide-saturation, 1)) brightness(var(--slide-brightness, 1)); box-shadow: 0 24px 68px rgba(0, 0, 0, .38); transform: translate3d(calc(-50% + var(--slide-x, 0px) + var(--drag-shift, 0px)), calc(-50% + var(--slide-y, 0px)), var(--slide-depth, 0px)) rotateZ(var(--slide-tilt, 0deg)) rotateY(var(--slide-rotate, 0deg)) scale(var(--slide-scale, 1)); transform-origin: var(--slide-origin, center); transition: transform 620ms var(--ease-out), opacity 240ms var(--ease-out), filter 240ms ease; will-change: transform; }
 .gameplay-slide.is-portal-jump { opacity: 0; transition: none; }
 .gameplay-carousel.is-dragging .gameplay-slide { transition: opacity 180ms ease, filter 180ms ease; }
-.gameplay-slide:not(.is-active) { filter: saturate(.72) brightness(.7); }
 .gameplay-slide img { pointer-events: none; transform: scale(1.1) translateX(calc(var(--image-shift, 0%) + var(--image-drag, 0px))); transition: transform 700ms var(--ease-out); will-change: transform; }
 .gameplay-carousel.is-dragging .gameplay-slide img { transition: none; }
 .gameplay-slide figcaption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.roles-heading { display: grid; gap: 44px; }
-.roles-icon { width: min(240px, 72%); height: 250px; justify-self: center; object-fit: contain; filter: drop-shadow(0 22px 28px rgba(0, 0, 0, .28)); }
+.roles-heading { display: grid; grid-template-rows: auto 1fr; gap: 44px; }
+.roles-icon { width: min(320px, 82%); height: 100%; justify-self: center; object-fit: contain; filter: drop-shadow(0 22px 28px rgba(0, 0, 0, .28)); }
 .roles-section { background: var(--bg); color: var(--ink); }
-.roles-grid { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(56px, 9vw, 132px); align-items: start; }
+.roles-grid { display: grid; grid-template-columns: 5fr 7fr; gap: clamp(56px, 9vw, 132px); align-items: stretch; }
 .roles-grid h2, .awards-layout h2 { margin: 0; font-size: clamp(3rem, 7vw, 6rem); }
 .roles-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line-dark); }
 .roles-list li { padding: 22px 0; border-bottom: 1px solid var(--line-dark); font-size: clamp(1.3rem, 2.2vw, 2rem); font-weight: 600; letter-spacing: -.025em; }
@@ -314,10 +313,13 @@ main > section + section, body > footer { border-top: 1px solid var(--line-dark)
   .project-row { grid-template-columns: 1fr; }
   .project-media { height: 48vw; }
   .gameplay-carousel { height: clamp(340px, 44vw, 460px); }
-  .roles-grid { grid-template-columns: 1fr; }
+  .roles-grid { grid-template-columns: 1fr; align-items: start; }
+  .roles-heading { grid-template-rows: auto auto; }
+  .roles-icon { height: auto; }
 }
 @media (max-width: 700px) {
   :root { --gutter: 24px; --nav: 64px; }
+  .project-page { --project-section-space: 48px; }
   .desktop-nav, .header-cta { display: none; }
   .intro-screen { padding: 18px; }
   .intro-ide { min-height: 330px; grid-template-rows: 44px 1fr 50px; }
@@ -350,13 +352,13 @@ main > section + section, body > footer { border-top: 1px solid var(--line-dark)
   .featured-banner-para .featured-banner-logo { top: 50%; right: auto; left: 50%; width: 34%; height: auto; transform: translate(-50%, -50%) scale(.96); }
   .featured-banner-label { right: 18px; bottom: 16px; left: 18px; }
   .featured-banner-label span:last-child { font-size: .85rem; }
-  .project-hero { padding: calc(var(--nav) + 48px) 8px 80px; }
+  .project-hero { padding-inline: 8px; }
   .project-hero-heading { margin-bottom: 32px; }
   .project-hero-heading { grid-template-columns: 1fr; gap: 20px; }
   .project-hero-heading h1 { font-size: clamp(3.8rem, 20vw, 5.2rem); }
   .project-hero-summary { margin: 0; }
   .project-hero-video { width: 100%; }
-  .gameplay-section, .roles-section, .awards-section { padding: 80px 8px; }
+  .gameplay-section, .roles-section, .awards-section { padding-inline: 8px; }
   .project-section-heading h2, .roles-grid h2 { font-size: clamp(2.8rem, 13vw, 4rem); }
   .awards-layout h2 { font-size: clamp(1.65rem, 7.3vw, 3rem); }
   .gameplay-section .project-section-heading { margin-bottom: 28px; }
