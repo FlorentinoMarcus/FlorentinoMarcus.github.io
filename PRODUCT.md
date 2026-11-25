@@ -21,7 +21,7 @@ The portfolio leads with playable work and documented credits across gameplay, s
 ## Capabilities and Constraints
 
 - Static HTML, CSS, and JavaScript hosted through GitHub Pages.
-- Personal email, résumé, education, availability, and private projects are currently undecided and must not be invented.
+- Personal email, résumé, availability, and private projects are currently undecided and must not be invented.
 - Project claims must be supported by the linked public project pages.
 
 ## Brand Commitments
@@ -35,7 +35,8 @@ The portfolio leads with playable work and documented credits across gameplay, s
 - `Para Po!`: released Windows simulation; Marcus is credited as lead programmer, gameplay programmer, systems programmer, UI programmer, and level designer.
 - `Relapse`: canceled Windows first-person action prototype; Marcus is credited as a programmer.
 - Real project screenshots in `images/para-po/` and `images/relapse/`, sourced from the linked itch.io project pages.
-- No testimonials, employment history, résumé, portrait, private client list, or performance metrics are on hand.
+- User-supplied LinkedIn evidence documents employment at HPL Game Design Corporation, Taktyl Studios, and PCI Tech Center, plus a 2024 game-development degree from De La Salle–College of Saint Benilde.
+- No testimonials, résumé, private client list, or performance metrics are on hand.
 
 ## Product Principles
 

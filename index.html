@@ -52,21 +52,24 @@
   <header class="site-header">
     <div class="wrap header-inner">
       <a class="skip-link" href="#main">Skip to content</a>
-      <a class="brand" href="#top" aria-label="Marcus Florentino, home">MF<span>.</span></a>
+      <a class="mobile-home" href="#top">Home</a>
       <nav class="desktop-nav" aria-label="Primary navigation">
-        <a href="#work">Work</a>
-        <a href="#about">About</a>
+        <a href="#top">Home</a>
+        <a href="#work">Projects</a>
+        <a href="#about">Experience</a>
         <a href="#contact">Contact</a>
+        <a href="">Resume</a>
       </nav>
-      <a class="button button-small header-cta" href="#work">View work</a>
       <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="Open menu">
         <span></span><span></span>
       </button>
     </div>
     <nav class="mobile-menu" id="mobile-menu" aria-label="Mobile navigation" hidden>
-      <a href="#work">Work</a>
-      <a href="#about">About</a>
+      <a href="#top">Home</a>
+      <a href="#work">Projects</a>
+      <a href="#about">Experience</a>
       <a href="#contact">Contact</a>
+      <a href="">Resume</a>
     </nav>
   </header>
 
@@ -91,11 +94,6 @@
           <span class="skill-callout skill-javascript" role="listitem"><strong>JavaScript</strong><span class="skill-level">Basic</span></span>
           <span class="skill-callout skill-html" role="listitem"><strong>HTML</strong><span class="skill-level">Basic</span></span>
           <span class="skill-callout skill-css" role="listitem"><strong>CSS</strong><span class="skill-level">Basic</span></span>
-        </div>
-        <div class="hero-bottom">
-          <div class="hero-actions">
-            <a class="button" href="">Resume</a>
-          </div>
         </div>
       </div>
     </section>
@@ -134,35 +132,110 @@
       </div>
     </section>
 
-    <section class="about-section" id="about">
-      <div class="wrap about-grid">
-        <div>
-          <h2>I build the systems players feel.</h2>
+    <section class="experience-snapshot" id="about" aria-labelledby="experience-snapshot-title">
+      <div class="wrap">
+        <header class="experience-snapshot-heading">
+          <h2 id="experience-snapshot-title">From Intern to Associate Team Lead.</h2>
+        </header>
+
+        <p class="experience-snapshot-tagline">One build at a time.</p>
+
+        <div class="experience-snapshot-list" aria-label="Experience snapshot">
+          <article class="experience-snapshot-row">
+            <p class="experience-snapshot-period"><time datetime="2025-03">Mar 2025</time> – Present</p>
+            <div class="experience-snapshot-role">
+              <h3>HPL Game Design Corporation</h3>
+              <p>Junior Game Developer → Associate Team Lead - Mid Level Developer</p>
+            </div>
+            <p class="experience-snapshot-summary">Developed and delivered multiple projects in fast-paced production cycles, including playable, video, and ecommerce ads using Unity and React. After advancing to Associate Team Lead, took responsibility for handling developers, QA, and source control.</p>
+          </article>
+
+          <article class="experience-snapshot-row">
+            <p class="experience-snapshot-period"><time datetime="2025-01">Jan 2025</time> – <time datetime="2025-03">Mar 2025</time></p>
+            <div class="experience-snapshot-role">
+              <h3>Taktyl Studios</h3>
+              <p>Unity Game Developer · Contractual</p>
+            </div>
+            <p class="experience-snapshot-summary">Collaborated with developers to build frontend interfaces and deliver application and game features, including QA and source control.</p>
+          </article>
+
+          <article class="experience-snapshot-row">
+            <p class="experience-snapshot-period"><time datetime="2024-01">Jan 2024</time> – <time datetime="2025-03">Mar 2025</time></p>
+            <div class="experience-snapshot-role">
+              <h3>PCI Tech Center</h3>
+              <p>Intern → Project-Based Game Developer</p>
+            </div>
+            <p class="experience-snapshot-summary">Developed and prepared 2D Unity projects for release from provided specifications and assets, handling QA and source control.</p>
+          </article>
         </div>
-        <div class="about-copy">
-          <p>My public work spans gameplay, systems, and UI programming, with level-design credits on a released Unreal Engine project.</p>
-          <ul class="capability-list" aria-label="Capabilities">
-            <li>Gameplay programming</li>
-            <li>Systems programming</li>
-            <li>UI programming</li>
-            <li>Level design</li>
-          </ul>
-        </div>
+
+        <a class="timeline-link" href="experience.html">
+          <span>Read the full timeline</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h13M13 7l5 5-5 5"/></svg>
+        </a>
       </div>
     </section>
   </main>
 
-  <footer class="closing" id="contact">
+  <footer class="closing contact-section" id="contact">
     <div class="wrap">
-      <div class="contact-row">
-        <div>
-          <h2>See the code.<br>Play the work.</h2>
-        </div>
-        <div class="contact-actions">
-          <a class="button" href="https://github.com/FlorentinoMarcus" target="_blank" rel="noreferrer">View GitHub</a>
-          <a class="text-link" href="https://king-marcus.itch.io" target="_blank" rel="noreferrer">View itch.io</a>
-        </div>
+      <header class="contact-heading">
+        <h2><span>Let’s start a</span><span>conversation.</span></h2>
+        <p>Have a game, interactive experience, or development challenge in mind? Tell me what you’re working on.</p>
+      </header>
+
+      <div class="contact-layout">
+        <form class="contact-form" action="mailto:Florentino.marcusjoshua.work@gmail.com" method="post" enctype="text/plain" data-contact-form>
+          <div class="contact-field-grid">
+            <label class="contact-field">
+              <span>Name <strong aria-hidden="true">*</strong></span>
+              <input type="text" name="name" autocomplete="name" required>
+            </label>
+            <label class="contact-field">
+              <span>Email <strong aria-hidden="true">*</strong></span>
+              <input type="email" name="email" autocomplete="email" required>
+            </label>
+            <label class="contact-field">
+              <span>Phone <small>(optional)</small></span>
+              <input type="tel" name="phone" autocomplete="tel">
+            </label>
+            <label class="contact-field">
+              <span>Topic <strong aria-hidden="true">*</strong></span>
+              <input type="text" name="topic" required>
+            </label>
+          </div>
+
+          <label class="contact-field contact-message">
+            <span>Message <strong aria-hidden="true">*</strong></span>
+            <textarea name="message" rows="8" maxlength="4000" required data-contact-message></textarea>
+          </label>
+          <p class="contact-count" aria-live="polite"><span data-contact-count>0</span>/4000</p>
+          <p class="contact-privacy">Fields marked * are required. Your details are used only to reply to you.</p>
+          <button class="button contact-submit" type="submit">Send message</button>
+          <p class="contact-status" data-contact-status role="status" aria-live="polite"></p>
+        </form>
+
+        <aside class="contact-details" aria-label="Contact details">
+          <div>
+            <h3>Email</h3>
+            <a href="mailto:Florentino.marcusjoshua.work@gmail.com">Florentino.marcusjoshua.work@gmail.com</a>
+          </div>
+          <div>
+            <h3>Phone</h3>
+            <a href="tel:+639054845622">+63 905 484 5622</a>
+          </div>
+          <div>
+            <h3>Based in</h3>
+            <p>Quezon City, Metro Manila<br>Philippines</p>
+          </div>
+          <div>
+            <h3>Elsewhere</h3>
+            <a href="https://ph.linkedin.com/in/marcus-joshua-florentino-8a034629a" target="_blank" rel="noreferrer">LinkedIn</a>
+            <a href="https://king-marcus.itch.io" target="_blank" rel="noreferrer">itch.io</a>
+          </div>
+        </aside>
       </div>
+
       <div class="footer-row">
         <a class="brand" href="#top" aria-label="Back to top">MF<span>.</span></a>
         <p>Marcus Florentino · Game developer · Philippines</p>

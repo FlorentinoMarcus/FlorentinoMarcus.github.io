@@ -8,7 +8,8 @@
   const pageRegions = [...document.querySelectorAll('.site-header, main, .closing')];
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const hero = document.querySelector('.hero');
-  const headerWrap = document.querySelector('.site-header .wrap');
+  const heroScene = document.querySelector('.hero-scene');
+  const heroLayoutReference = document.querySelector('.closing > .wrap');
   const heroReference = { width: 1280, height: 638 };
   let heroResizeFrame;
   let introFinished = false;
@@ -20,15 +21,18 @@
     if (intro && !introSeen) window.sessionStorage.setItem('portfolio-intro-seen', 'true');
   } catch {}
   const syncHeroScale = () => {
-    if (!hero) return;
+    if (!hero || !heroScene) return;
     const navHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav')) || 72;
-    const availableWidth = headerWrap?.getBoundingClientRect().width || window.innerWidth;
     const availableHeight = Math.max(1, window.innerHeight - navHeight - 28);
-    const scale = Math.min(1, availableWidth / heroReference.width, availableHeight / heroReference.height);
-    const heroEdgeSpace = 12 + (heroReference.height * .1 * scale);
-    const heroOverhang = 48 * scale;
-    hero.style.setProperty('--hero-scale', scale.toFixed(6));
-    hero.style.setProperty('--hero-scaled-height', `${(heroReference.height * scale).toFixed(3)}px`);
+    const layoutWidth = heroLayoutReference?.getBoundingClientRect().width || window.innerWidth;
+    const layoutScale = Math.min(1, layoutWidth / heroReference.width, availableHeight / heroReference.height);
+    const sceneTop = Number.parseFloat(getComputedStyle(heroScene).top) || 0;
+    const balancedHeight = (2 * sceneTop) + ((heroReference.height + 132) * layoutScale);
+    const heroEdgeSpace = 12 + (heroReference.height * .1 * layoutScale);
+    const heroOverhang = 48 * layoutScale;
+    hero.style.setProperty('--hero-scale', layoutScale.toFixed(6));
+    hero.style.setProperty('--hero-scaled-height', `${(heroReference.height * layoutScale).toFixed(3)}px`);
+    hero.style.setProperty('--hero-balanced-height', `${balancedHeight.toFixed(3)}px`);
     document.documentElement.style.setProperty('--hero-edge-space', `${heroEdgeSpace.toFixed(3)}px`);
     document.documentElement.style.setProperty('--hero-overhang', `${heroOverhang.toFixed(3)}px`);
   };
@@ -316,36 +320,78 @@
   menu?.querySelectorAll('a').forEach((link) => link.addEventListener('click', closeMenu));
   window.addEventListener('resize', () => { if (window.innerWidth > 700) closeMenu(); });
 
-  const projectSections = ['trailer', 'mob-control', 'gameplay', 'roles', 'awards']
+  const isExperiencePage = document.body.classList.contains('experience-page');
+  const navigationSectionIds = document.body.classList.contains('project-page')
+    ? ['trailer', 'mob-control', 'gameplay', 'roles', 'awards']
+    : isExperiencePage
+      ? ['work-experience', 'education']
+      : ['top', 'work', 'about', 'contact'];
+  const navigationSections = navigationSectionIds
     .map((id) => document.getElementById(id))
     .filter(Boolean);
-  const projectNavLinks = [...document.querySelectorAll('.desktop-nav a[href^="#"], .mobile-menu a[href^="#"]')];
-  let projectNavFrame;
-  const updateProjectNavigation = () => {
-    if (!projectSections.length || !projectNavLinks.length) return;
+  const navigationLinks = [...document.querySelectorAll('.desktop-nav a[href^="#"], .mobile-menu a[href^="#"]')];
+  let navigationFrame;
+  const updateSectionNavigation = () => {
+    if (!navigationSections.length || !navigationLinks.length) return;
     const navHeight = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--nav')) || 72;
     const marker = window.scrollY + navHeight + Math.min(window.innerHeight * .28, 240);
-    let currentSection = projectSections[0].id;
-    projectSections.forEach((projectSection) => {
-      if (projectSection.offsetTop <= marker) currentSection = projectSection.id;
-    });
-    if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
-      currentSection = projectSections.at(-1).id;
+    let currentSection = null;
+    if (isExperiencePage) {
+      currentSection = navigationSections.find((section) => (
+        section.offsetTop <= marker && section.offsetTop + section.offsetHeight > marker
+      ))?.id || null;
+    } else {
+      navigationSections.forEach((section) => {
+        if (section.offsetTop <= marker) currentSection = section.id;
+      });
     }
-    projectNavLinks.forEach((link) => {
+    if (!isExperiencePage && window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 2) {
+      currentSection = navigationSections.at(-1).id;
+    }
+    navigationLinks.forEach((link) => {
       const isActive = link.getAttribute('href') === `#${currentSection}`;
       link.classList.toggle('is-active', isActive);
       if (isActive) link.setAttribute('aria-current', 'location');
       else link.removeAttribute('aria-current');
     });
   };
-  const queueProjectNavigation = () => {
-    window.cancelAnimationFrame(projectNavFrame);
-    projectNavFrame = window.requestAnimationFrame(updateProjectNavigation);
+  const queueSectionNavigation = () => {
+    window.cancelAnimationFrame(navigationFrame);
+    navigationFrame = window.requestAnimationFrame(updateSectionNavigation);
   };
-  window.addEventListener('scroll', queueProjectNavigation, { passive: true });
-  window.addEventListener('resize', queueProjectNavigation, { passive: true });
-  updateProjectNavigation();
+  window.addEventListener('scroll', queueSectionNavigation, { passive: true });
+  window.addEventListener('resize', queueSectionNavigation, { passive: true });
+  updateSectionNavigation();
+
+  const contactForm = document.querySelector('[data-contact-form]');
+  const contactMessage = document.querySelector('[data-contact-message]');
+  const contactCount = document.querySelector('[data-contact-count]');
+  const contactStatus = document.querySelector('[data-contact-status]');
+  contactMessage?.addEventListener('input', () => {
+    if (contactCount) contactCount.textContent = String(contactMessage.value.length);
+  });
+  contactForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!contactForm.reportValidity()) return;
+
+    const formData = new FormData(contactForm);
+    const name = String(formData.get('name') || '').trim();
+    const email = String(formData.get('email') || '').trim();
+    const phone = String(formData.get('phone') || '').trim();
+    const topic = String(formData.get('topic') || '').trim();
+    const message = String(formData.get('message') || '').trim();
+    const body = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Phone: ${phone || 'Not provided'}`,
+      '',
+      message
+    ].join('\n');
+    const mailto = `mailto:Florentino.marcusjoshua.work@gmail.com?subject=${encodeURIComponent(topic)}&body=${encodeURIComponent(body)}`;
+
+    if (contactStatus) contactStatus.textContent = 'Opening your email app with this message ready to send…';
+    window.location.href = mailto;
+  });
 
   const section = document.querySelector('.case-track');
   const steps = [...document.querySelectorAll('[data-chapter]')];
