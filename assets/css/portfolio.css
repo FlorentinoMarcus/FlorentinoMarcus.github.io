@@ -28,7 +28,7 @@ h3 { font-size: clamp(2rem, 4vw, 4.8rem); font-weight: 600; }
 .skip-link { position: fixed; z-index: 100; top: 10px; left: 10px; transform: translateY(-150%); padding: 10px 16px; background: var(--accent); color: var(--bg); }
 .skip-link:focus { transform: translateY(0); }
 .site-header { position: fixed; z-index: 20; top: 12px; width: 100%; height: var(--nav); pointer-events: none; }
-.header-inner { width: max-content; max-width: calc(100% - 32px); min-height: 56px; display: flex; align-items: center; justify-content: center; margin: 0 auto 0 12px; padding: 6px 18px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px; background: rgba(24, 20, 18, .7); box-shadow: 0 12px 32px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .08); backdrop-filter: blur(22px) saturate(155%); -webkit-backdrop-filter: blur(22px) saturate(155%); pointer-events: auto; }
+.header-inner { width: max-content; max-width: calc(100% - 32px); min-height: 56px; display: flex; align-items: center; justify-content: center; margin: 0 12px 0 auto; padding: 6px 18px; border: 1px solid rgba(255, 255, 255, .14); border-radius: 999px; background: rgba(24, 20, 18, .7); box-shadow: 0 12px 32px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .08); backdrop-filter: blur(22px) saturate(155%); -webkit-backdrop-filter: blur(22px) saturate(155%); pointer-events: auto; }
 .desktop-nav { display: flex; gap: 32px; }
 .mobile-home { display: none; }
 .desktop-nav a, .text-link { position: relative; min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; }
